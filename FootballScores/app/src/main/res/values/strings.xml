@@ -43,4 +43,7 @@
     <string name="away_crest_text">Away Crest</string>
     <string name="away_name_text">Away Name</string>
     <string name="pager_header_text">Header</string>
+
+    <string name="user_pref_match_ids">match_ids</string>
+    <string name="user_pref_match_count">match_count</string>
 </resources>

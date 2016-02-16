@@ -1,11 +1,19 @@
 package barqsoft.footballscores.service;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.RingtoneManager;
 import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,7 +26,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -31,6 +44,7 @@ import barqsoft.footballscores.R;
 public class myFetchService extends IntentService
 {
     public static final String LOG_TAG = "myFetchService";
+
     public myFetchService()
     {
         super("myFetchService");
@@ -39,7 +53,8 @@ public class myFetchService extends IntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
-        getData("n2");
+        // TODO investigate timeframe
+        //getData("n2");
         getData("p2");
 
         return;
@@ -133,6 +148,7 @@ public class myFetchService extends IntentService
     }
     private void processJSONdata (String JSONdata,Context mContext, boolean isReal)
     {
+
         //JSON data
         // This set of league codes is for the 2015/2016 season. In fall of 2016, they will need to
         // be updated. Feel free to use the codes
@@ -181,6 +197,15 @@ public class myFetchService extends IntentService
 
             //ContentValues to be inserted
             Vector<ContentValues> values = new Vector <ContentValues> (matches.length());
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+
+            Set<String> matchIdSet = sharedPreferences
+                    .getStringSet(mContext.getString(R.string.user_pref_match_ids), Collections.EMPTY_SET);
+
+            Set<String> updatedMatchIdSet = new HashSet<>(matchIdSet.size());
+            updatedMatchIdSet.addAll(matchIdSet);
+
             for(int i = 0;i < matches.length();i++)
             {
 
@@ -256,9 +281,27 @@ public class myFetchService extends IntentService
                     //Log.v(LOG_TAG,Home_goals);
                     //Log.v(LOG_TAG,Away_goals);
 
+                    if (!matchIdSet.contains(match_id)) {
+                        updatedMatchIdSet.add(match_id);
+                    }
+
                     values.add(match_values);
                 }
             }
+
+            if (matchIdSet.size() < updatedMatchIdSet.size()) {
+                // new scores available
+                sharedPreferences
+                        .edit()
+                        .putStringSet(mContext.getString(R.string.user_pref_match_ids), updatedMatchIdSet)
+                        .commit();
+
+                sharedPreferences
+                        .edit()
+                        .putLong(mContext.getString(R.string.user_pref_match_count), updatedMatchIdSet.size())
+                        .commit();
+            }
+
             int inserted_data = 0;
             ContentValues[] insert_data = new ContentValues[values.size()];
             values.toArray(insert_data);
@@ -272,6 +315,44 @@ public class myFetchService extends IntentService
             Log.e(LOG_TAG,e.getMessage());
         }
 
+    }
+
+    public static class AlarmReceiver extends BroadcastReceiver {
+        public final int NEW_SCORE_NOTIFICATION_ID = 3001;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            long beforeMatchCount = sharedPreferences.getLong(context.getString(R.string.user_pref_match_count), -1);
+            if (beforeMatchCount == -1) {
+                Log.e(LOG_TAG, "expected non-empty beforeMatchCount.");
+                return;
+            }
+
+            // re-query data
+            Intent service_start = new Intent(context, myFetchService.class);
+            context.startService(service_start);
+
+            // compare data before and after
+            long afterMatchCount = sharedPreferences.getLong(context.getString(R.string.user_pref_match_count), -1);
+            if (afterMatchCount == -1) {
+                Log.e(LOG_TAG, "expected non-empty afterMatchCount.");
+                return;
+            }
+
+            if (afterMatchCount > beforeMatchCount) {
+                NotificationManager notificationManager = (NotificationManager) context
+                        .getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(context)
+                                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                                .setSmallIcon(R.drawable.ic_launcher)
+                                .setContentTitle("New Scores")
+                                .setContentText("New scores available!");
+
+                notificationManager.notify(NEW_SCORE_NOTIFICATION_ID, mBuilder.build());
+            }
+        }
     }
 }
 
