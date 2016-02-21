@@ -9,11 +9,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -48,6 +50,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         if(ean!=null) {
             outState.putString(EAN_CONTENT, ean.getText().toString());
         }
+        clearFields();
     }
 
     @Override
@@ -69,18 +72,29 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
             @Override
             public void afterTextChanged(Editable s) {
-                String ean =s.toString();
-                //catch isbn10 numbers
-                if(ean.length()==10 && !ean.startsWith("978")){
-                    ean="978"+ean;
+                String eanText = s.toString();
+                if (TextUtils.isEmpty(eanText)) {
+                    return;
                 }
-                if(ean.length()<13){
+
+                //catch isbn10 numbers
+                if(eanText.length()==10 && !eanText.startsWith("978")){
+                    eanText="978"+eanText;
+                }
+                if(eanText.length()<13){
                     clearFields();
                     return;
                 }
-                //Once we have an ISBN, start a book intent
+
+                //We now have an ISBN
+                if (ean != null) {
+                    // close the soft keyboard to expose the action buttons
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(ean.getWindowToken(), 0);
+                }
+
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
+                bookIntent.putExtra(BookService.EAN, eanText);
                 bookIntent.setAction(BookService.FETCH_BOOK);
                 getActivity().startService(bookIntent);
                 AddBook.this.restartLoader();
