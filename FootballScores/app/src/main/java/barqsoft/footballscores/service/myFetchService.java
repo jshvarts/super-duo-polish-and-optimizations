@@ -54,7 +54,7 @@ public class myFetchService extends IntentService
     protected void onHandleIntent(Intent intent)
     {
         // TODO investigate timeframe
-        //getData("n2");
+        getData("n2");
         getData("p2");
 
         return;
@@ -190,6 +190,9 @@ public class myFetchService extends IntentService
         String match_id = null;
         String match_day = null;
 
+        boolean firstTimeRun = false;
+        Set<String> matchIdSet = null;
+        Set<String> updatedMatchIdSet = null;
 
         try {
             JSONArray matches = new JSONObject(JSONdata).getJSONArray(FIXTURES);
@@ -198,13 +201,18 @@ public class myFetchService extends IntentService
             //ContentValues to be inserted
             Vector<ContentValues> values = new Vector <ContentValues> (matches.length());
 
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-            Set<String> matchIdSet = sharedPreferences
+            matchIdSet = sharedPreferences
                     .getStringSet(mContext.getString(R.string.user_pref_match_ids), Collections.EMPTY_SET);
 
-            Set<String> updatedMatchIdSet = new HashSet<>(matchIdSet.size());
-            updatedMatchIdSet.addAll(matchIdSet);
+            if (matchIdSet.isEmpty()) {
+                firstTimeRun = true;
+            } else {
+                updatedMatchIdSet = new HashSet<>(matchIdSet.size());
+                updatedMatchIdSet.addAll(matchIdSet);
+            }
 
             for(int i = 0;i < matches.length();i++)
             {
@@ -281,25 +289,23 @@ public class myFetchService extends IntentService
                     //Log.v(LOG_TAG,Home_goals);
                     //Log.v(LOG_TAG,Away_goals);
 
-                    if (!matchIdSet.contains(match_id)) {
-                        updatedMatchIdSet.add(match_id);
+                    if (!firstTimeRun) {
+                        if (!matchIdSet.contains(match_id)) {
+                            updatedMatchIdSet.add(match_id);
+                        }
                     }
 
                     values.add(match_values);
                 }
             }
 
-            if (matchIdSet.size() < updatedMatchIdSet.size()) {
-                // new scores available
-                sharedPreferences
-                        .edit()
-                        .putStringSet(mContext.getString(R.string.user_pref_match_ids), updatedMatchIdSet)
-                        .commit();
-
-                sharedPreferences
-                        .edit()
-                        .putLong(mContext.getString(R.string.user_pref_match_count), updatedMatchIdSet.size())
-                        .commit();
+            if (firstTimeRun) {
+                recordLatestMatchData(sharedPreferences, matchIdSet);
+            } else {
+                if (matchIdSet.size() < updatedMatchIdSet.size()) {
+                    // new scores available
+                    recordLatestMatchData(sharedPreferences, updatedMatchIdSet);
+                }
             }
 
             int inserted_data = 0;
@@ -353,6 +359,23 @@ public class myFetchService extends IntentService
                 notificationManager.notify(NEW_SCORE_NOTIFICATION_ID, mBuilder.build());
             }
         }
+    }
+
+    private void recordLatestMatchData(SharedPreferences sharedPreferences, Set<String> matchIdSet) {
+        if (matchIdSet == null || matchIdSet.isEmpty()) {
+            Log.e(LOG_TAG, "Empty match id set!");
+            return;
+        }
+
+        sharedPreferences
+                .edit()
+                .putStringSet(getApplicationContext().getString(R.string.user_pref_match_ids), matchIdSet)
+                .commit();
+
+        sharedPreferences
+                .edit()
+                .putLong(getApplicationContext().getString(R.string.user_pref_match_count), matchIdSet.size())
+                .commit();
     }
 }
 
