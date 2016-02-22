@@ -109,6 +109,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         rootView.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 ean.setText("");
             }
         });
@@ -145,6 +146,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
         if (resultCode == Activity.RESULT_OK) {
             String eanText = data.getStringExtra(SCAN_CONTENTS);
+            if (ean != null) {
+                ean.setText(eanText);
+            }
             createBookServiceIntent(eanText);
         }
     }
