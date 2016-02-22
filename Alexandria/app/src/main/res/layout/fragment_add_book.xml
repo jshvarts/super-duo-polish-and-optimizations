@@ -4,8 +4,8 @@
 
     <RelativeLayout
         android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top">
 
         <LinearLayout
@@ -18,15 +18,10 @@
             android:layout_centerHorizontal="true">
 
             <EditText
+                style="@style/EditText.AddBook"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="number"
-                android:minEms="@integer/ean_width"
                 android:id="@+id/ean"
-                android:saveEnabled="true"
-                android:maxLength="@integer/ean_size"
-                android:maxLines="1"
-                android:hint="@string/input_hint"
                 android:paddingRight="20dp"/>
 
             <Button

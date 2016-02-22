@@ -31,7 +31,8 @@
             android:layout_toStartOf="@+id/searchButton"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp"
+            android:imeOptions="actionDone|flagNoExtractUi"/>
 
 
         <ListView android:id="@+id/listOfBooks"
