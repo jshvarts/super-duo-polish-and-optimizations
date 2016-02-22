@@ -1,6 +1,7 @@
 package it.jaschke.alexandria;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,6 +12,7 @@ import android.support.v4.content.CursorLoader;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,25 +23,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.services.DownloadImage;
 
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
+    public static final String SCAN_CONTENTS = "scanContents";
+    public static final int SCAN_EAN_REQUEST_CODE = 1000;
+
+    private static final String LOG_TAG = AddBook.class.getSimpleName();
+
     private EditText ean;
     private final int LOADER_ID = 1;
     private View rootView;
     private final String EAN_CONTENT="eanContent";
-    private static final String SCAN_FORMAT = "scanFormat";
-    private static final String SCAN_CONTENTS = "scanContents";
-
-    private String mScanFormat = "Format:";
-    private String mScanContents = "Contents:";
-
-
 
     public AddBook(){
     }
@@ -50,7 +48,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         if(ean!=null) {
             outState.putString(EAN_CONTENT, ean.getText().toString());
         }
-        clearFields();
     }
 
     @Override
@@ -92,31 +89,20 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(ean.getWindowToken(), 0);
                 }
-
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, eanText);
-                bookIntent.setAction(BookService.FETCH_BOOK);
-                getActivity().startService(bookIntent);
-                AddBook.this.restartLoader();
+                createBookServiceIntent(eanText);
             }
         });
 
         rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // This is the callback method that the system will invoke when your button is
-                // clicked. You might do this by launching another app or by including the
-                //functionality directly in this app.
-                // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
-                // are using an external app.
-                //when you're done, remove the toast below.
-                Context context = getActivity();
-                CharSequence text = "This button should let you scan a book for its barcode!";
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-
+                Intent scannerIntent = new Intent(getActivity(), BarcodeScannerActivity.class);
+                try {
+                    startActivityForResult(scannerIntent, SCAN_EAN_REQUEST_CODE);
+                } catch (ActivityNotFoundException e) {
+                    Log.e(LOG_TAG, "error scanning the barcode: " + e);
+                    Toast.makeText(getActivity(), "Error scanning the barcode!", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -144,6 +130,23 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode != SCAN_EAN_REQUEST_CODE) {
+            return;
+        }
+        if (resultCode == Activity.RESULT_CANCELED) {
+            Log.e(LOG_TAG, "Unable to scan EAN");
+            return;
+        }
+        if (resultCode == Activity.RESULT_OK) {
+            String eanText = data.getStringExtra(SCAN_CONTENTS);
+            createBookServiceIntent(eanText);
+        }
     }
 
     private void restartLoader(){
@@ -201,6 +204,21 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
 
+    }
+
+    private void createBookServiceIntent(String eanText) {
+        if (TextUtils.isEmpty(eanText)) {
+            Log.e(LOG_TAG, "expected non-empty eanText");
+            return;
+        }
+
+        Log.d(LOG_TAG, "processing book with EAN " + eanText);
+
+        Intent bookIntent = new Intent(getActivity(), BookService.class);
+        bookIntent.putExtra(BookService.EAN, eanText);
+        bookIntent.setAction(BookService.FETCH_BOOK);
+        getActivity().startService(bookIntent);
+        AddBook.this.restartLoader();
     }
 
     private void clearFields(){
