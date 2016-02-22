@@ -4,23 +4,17 @@
 
     <RelativeLayout
         android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="left|center_vertical">
 
         <EditText
+            style="@style/EditText.AddBook"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:minEms="@integer/ean_width"
             android:id="@+id/ean"
-            android:saveEnabled="true"
-            android:textIsSelectable="false"
-            android:maxLength="@integer/ean_size"
-            android:hint="@string/input_hint"
             android:layout_marginLeft="40dp"
             android:layout_marginStart="40dp"
-            android:maxLines="1"
             android:layout_marginTop="30dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"

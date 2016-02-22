@@ -5,4 +5,15 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="EditText.AddBook" parent="Widget.AppCompat.EditText">
+        <item name="android:inputType">number</item>
+        <item name="android:saveEnabled">true</item>
+        <item name="android:textIsSelectable">false</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:minEms">@integer/ean_width</item>
+        <item name="android:maxLength">@integer/ean_size</item>
+        <item name="android:hint">@string/input_hint</item>
+        <item name="android:imeOptions">actionDone|flagNoExtractUi</item>
+    </style>
+
 </resources>
