@@ -40,6 +40,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private final String EAN_CONTENT="eanContent";
 
     public AddBook(){
+        setRetainInstance(true);
     }
 
     @Override

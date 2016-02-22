@@ -33,6 +33,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     private ShareActionProvider shareActionProvider;
 
     public BookDetail(){
+        setRetainInstance(true);
     }
 
     @Override
