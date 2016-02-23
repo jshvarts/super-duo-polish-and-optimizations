@@ -85,11 +85,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 }
 
                 //We now have an ISBN
-                if (ean != null) {
-                    // close the soft keyboard to expose the action buttons
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(ean.getWindowToken(), 0);
-                }
+                // close the soft keyboard to expose the action buttons
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(ean.getWindowToken(), 0);
                 createBookServiceIntent(eanText);
             }
         });
@@ -110,8 +108,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         rootView.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 ean.setText("");
+                clearFields();
             }
         });
 

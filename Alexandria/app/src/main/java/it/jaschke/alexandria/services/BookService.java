@@ -163,7 +163,7 @@ public class BookService extends IntentService {
                 bookArray = bookJson.getJSONArray(ITEMS);
             }else{
                 Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
-                messageIntent.putExtra(MainActivity.MESSAGE_KEY,getResources().getString(R.string.not_found));
+                messageIntent.putExtra(MainActivity.MESSAGE_KEY,getResources().getString(R.string.book_not_found));
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
                 return;
             }

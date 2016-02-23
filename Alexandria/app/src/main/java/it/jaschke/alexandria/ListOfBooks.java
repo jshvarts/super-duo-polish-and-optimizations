@@ -1,19 +1,21 @@
 package it.jaschke.alexandria;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import it.jaschke.alexandria.api.BookListAdapter;
 import it.jaschke.alexandria.api.Callback;
@@ -48,18 +50,24 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                 null  // sort order
         );
 
-
-        bookListAdapter = new BookListAdapter(getActivity(), cursor, 0);
         View rootView = inflater.inflate(R.layout.fragment_list_of_books, container, false);
+        bookListAdapter = new BookListAdapter(getActivity(), cursor, 0);
         searchText = (EditText) rootView.findViewById(R.id.searchText);
         rootView.findViewById(R.id.searchButton).setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(searchText.getWindowToken(), 0);
                         ListOfBooks.this.restartLoader();
                     }
                 }
         );
+
+        if (cursor.getCount() == 0) {
+            showNoBooksAvailableMessage();
+            return rootView;
+        }
 
         bookList = (ListView) rootView.findViewById(R.id.listOfBooks);
         bookList.setAdapter(bookListAdapter);
@@ -114,6 +122,12 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         bookListAdapter.swapCursor(data);
+
+        if (data.getCount() == 0) {
+            showNoBooksAvailableMessage();
+            return;
+        }
+
         if (position != ListView.INVALID_POSITION) {
             bookList.smoothScrollToPosition(position);
         }
@@ -128,5 +142,10 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         activity.setTitle(R.string.books);
+    }
+
+    private void showNoBooksAvailableMessage() {
+        Toast.makeText(getActivity(), getActivity().getString(R.string.books_not_found),
+                Toast.LENGTH_SHORT).show();
     }
 }
