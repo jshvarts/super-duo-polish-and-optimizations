@@ -21,7 +21,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/fullBookTitle"
-                    android:textSize="@dimen/head_line"
+                    android:textSize="@dimen/headline_textsize"
                     android:textIsSelectable="true"
                     android:textStyle="bold"
                     android:paddingRight="20dp"

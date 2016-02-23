@@ -1,6 +1,5 @@
 package it.jaschke.alexandria;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -41,6 +40,9 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        // Set title bar
+        getActivity().setTitle(R.string.books);
 
         Cursor cursor = getActivity().getContentResolver().query(
                 AlexandriaContract.BookEntry.CONTENT_URI,
@@ -136,12 +138,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         bookListAdapter.swapCursor(null);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        activity.setTitle(R.string.books);
     }
 
     private void showNoBooksAvailableMessage() {

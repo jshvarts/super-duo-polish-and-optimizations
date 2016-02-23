@@ -151,6 +151,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     }
 
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
+    }
+
     private class MessageReciever extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
