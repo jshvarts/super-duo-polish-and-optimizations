@@ -27,8 +27,10 @@ public class ScoresProvider extends ContentProvider
             DatabaseContract.scores_table.DATE_COL + " LIKE ?";
     private static final String SCORES_BY_ID =
             DatabaseContract.scores_table.MATCH_ID + " = ?";
+    // find latest match id with scores available
     private static final String FIND_LATEST_MATCH_ID = "SELECT " + DatabaseContract.scores_table.MATCH_ID + " FROM "
-            + DatabaseContract.SCORES_TABLE + " ORDER BY " + DatabaseContract.scores_table._ID + " DESC LIMIT 1";
+            + DatabaseContract.SCORES_TABLE + " WHERE " + DatabaseContract.scores_table.HOME_GOALS_COL
+            + " != -1 ORDER BY " + DatabaseContract.scores_table._ID + " DESC LIMIT 1";
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -111,9 +113,6 @@ public class ScoresProvider extends ContentProvider
             case MATCHES_WITH_DATE:
                     //Log.v(FetchScoreTask.LOG_TAG,selectionArgs[1]);
                     //Log.v(FetchScoreTask.LOG_TAG,selectionArgs[2]);
-                if (selectionArgs == null) {
-                    break;
-                }
                 retCursor = mOpenHelper.getReadableDatabase().query(
                 DatabaseContract.SCORES_TABLE,
                 projection,SCORES_BY_DATE,selectionArgs,null,null,sortOrder); break;
