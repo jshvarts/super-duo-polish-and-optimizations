@@ -27,7 +27,8 @@ public class ScoresProvider extends ContentProvider
             DatabaseContract.scores_table.DATE_COL + " LIKE ?";
     private static final String SCORES_BY_ID =
             DatabaseContract.scores_table.MATCH_ID + " = ?";
-    private static final String FIND_LATEST_ID = "SELECT last_insert_rowid() from " + DatabaseContract.SCORES_TABLE;
+    private static final String FIND_LATEST_MATCH_ID = "SELECT " + DatabaseContract.scores_table.MATCH_ID + " FROM "
+            + DatabaseContract.SCORES_TABLE + " ORDER BY " + DatabaseContract.scores_table._ID + " DESC LIMIT 1";
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -175,12 +176,11 @@ public class ScoresProvider extends ContentProvider
 
     @Override
     public Bundle call(String method, String arg, Bundle extras) {
-        Bundle retBundle = null;
-        if (DatabaseContract.GET_LATEST_ID_METHOD.equals(method)) {
-            Cursor cursor = mOpenHelper.getReadableDatabase().rawQuery(FIND_LATEST_ID, null);
+        Bundle retBundle = new Bundle();
+        if (DatabaseContract.GET_LATEST_MATCH_ID_METHOD.equals(method)) {
+            Cursor cursor = mOpenHelper.getReadableDatabase().rawQuery(FIND_LATEST_MATCH_ID, null);
             cursor.moveToFirst();
-            retBundle = new Bundle();
-            retBundle.putInt("id", cursor.getInt(0));
+            retBundle.putInt(DatabaseContract.scores_table.MATCH_ID, cursor.getInt(0));
         }
         return retBundle;
     }
