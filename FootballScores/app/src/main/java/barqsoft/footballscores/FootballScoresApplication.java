@@ -1,19 +1,13 @@
 package barqsoft.footballscores;
 
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.Application;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import java.util.Set;
-
-import barqsoft.footballscores.service.myFetchService;
+import com.facebook.stetho.Stetho;
 
 /**
  * Created by shvartsy on 2/15/16.
@@ -24,11 +18,19 @@ public class FootballScoresApplication extends Application implements Applicatio
     public void onCreate() {
         super.onCreate();
         registerActivityLifecycleCallbacks(this);
+        Stetho.initializeWithDefaults(this);
     }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         // do nothing
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        sharedPreferences
+                .edit()
+                .putString(getApplicationContext().getString(R.string.user_pref_match_count), "4")
+                .commit();
     }
 
     @Override
@@ -39,27 +41,32 @@ public class FootballScoresApplication extends Application implements Applicatio
     @Override
     public void onActivityResumed(Activity activity) {
         // cancel alarm manager to avoid notifications while the app is in foreground
-        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(getApplicationContext(), myFetchService.AlarmReceiver.class);
-        PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+        //AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        //Intent intent = new Intent(getApplicationContext(), myFetchService.AlarmReceiver.class);
+        //PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
 
-        alarmManager.cancel(pendingAlarmIntent);
+        //alarmManager.cancel(pendingAlarmIntent);
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
         // start AlarmManager to enable notifications while the app is in background
-        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(getApplicationContext(), myFetchService.AlarmReceiver.class);
-        PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+        //AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        //Intent intent = new Intent(getApplicationContext(), myFetchService.AlarmReceiver.class);
+        //PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
 
         // repeat alarm every 10 minutes
-        long repeatingTime = 10 * 60 * 1000;
+        //long repeatingTime = 10 * 60 * 1000;
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis(),
-                repeatingTime,
-                pendingAlarmIntent);
+        //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+        //        System.currentTimeMillis(),
+        //        repeatingTime,
+        //        pendingAlarmIntent);
+
+        Bundle bundle = activity.getContentResolver().call(DatabaseContract.BASE_CONTENT_URI,
+                DatabaseContract.GET_LATEST_ID_METHOD, null, null);
+
+        Log.d("-JS-", bundle.toString());
     }
 
     @Override
