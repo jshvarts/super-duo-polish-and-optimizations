@@ -8,13 +8,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <barqsoft.footballscores.AccessiblePagerTabStrip
+            style="@style/viewPagerTitleStrip"
             android:id="@+id/pager_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:paddingBottom="4dp"
-            android:paddingTop="4dp"
-            android:contentDescription="@string/pager_header_text"/>
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:contentDescription="@string/pager_header_text"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" />
         ></android.support.v4.view.ViewPager>
 
 </LinearLayout>
