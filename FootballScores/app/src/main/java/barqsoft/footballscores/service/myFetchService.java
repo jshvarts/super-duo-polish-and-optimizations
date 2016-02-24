@@ -316,7 +316,7 @@ public class myFetchService extends IntentService
             }
             Log.d(LOG_TAG, "latest match id after refresh: " + latestMatchIdAfterRefresh);
 
-            if (latestMatchIdAfterRefresh > latestMatchIdBeforeRefresh) {
+            if (latestMatchIdAfterRefresh != latestMatchIdBeforeRefresh) {
                 NotificationManager notificationManager = (NotificationManager) context
                         .getSystemService(Context.NOTIFICATION_SERVICE);
 

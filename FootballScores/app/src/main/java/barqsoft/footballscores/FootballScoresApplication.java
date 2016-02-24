@@ -50,6 +50,11 @@ public class FootballScoresApplication extends Application implements Applicatio
 
     @Override
     public void onActivityPaused(Activity activity) {
+        // do nothing
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
         // start AlarmManager to enable notifications while the app is in background
         AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
@@ -62,11 +67,6 @@ public class FootballScoresApplication extends Application implements Applicatio
                 System.currentTimeMillis(),
                 repeatingTime,
                 pendingAlarmIntent);
-    }
-
-    @Override
-    public void onActivityStopped(Activity activity) {
-        // do nothing
     }
 
     @Override
