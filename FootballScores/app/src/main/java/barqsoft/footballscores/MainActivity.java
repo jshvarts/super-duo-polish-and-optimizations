@@ -17,6 +17,9 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setDefaultUncaughtExceptionHandler();
+
         setContentView(R.layout.activity_main);
         Log.d(LOG_TAG, "Reached MainActivity onCreate");
         if (savedInstanceState == null) {
@@ -26,7 +29,6 @@ public class MainActivity extends ActionBarActivity
                     .commit();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -75,5 +77,16 @@ public class MainActivity extends ActionBarActivity
         selected_match_id = savedInstanceState.getInt("Selected_match");
         my_main = (PagerFragment) getSupportFragmentManager().getFragment(savedInstanceState,"my_main");
         super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    private static void setDefaultUncaughtExceptionHandler() {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                Log.e(LOG_TAG, "exception in thread: " + t.getName(), e);
+                //e.printStackTrace();
+            }
+        });
     }
 }
