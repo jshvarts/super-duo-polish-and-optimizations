@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.os.Bundle;
 
 /**
  * Created by yehya khaled on 2/25/2015.
@@ -26,7 +27,7 @@ public class ScoresProvider extends ContentProvider
             DatabaseContract.scores_table.DATE_COL + " LIKE ?";
     private static final String SCORES_BY_ID =
             DatabaseContract.scores_table.MATCH_ID + " = ?";
-
+    private static final String FIND_LATEST_ID = "SELECT last_insert_rowid() from " + DatabaseContract.SCORES_TABLE;
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -131,8 +132,7 @@ public class ScoresProvider extends ContentProvider
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-
-        return null;
+        return Uri.withAppendedPath(DatabaseContract.BASE_CONTENT_URI, DatabaseContract.scores_table._ID);
     }
 
     @Override
@@ -171,5 +171,17 @@ public class ScoresProvider extends ContentProvider
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         return 0;
+    }
+
+    @Override
+    public Bundle call(String method, String arg, Bundle extras) {
+        Bundle retBundle = null;
+        if (DatabaseContract.GET_LATEST_ID_METHOD.equals(method)) {
+            Cursor cursor = mOpenHelper.getReadableDatabase().rawQuery(FIND_LATEST_ID, null);
+            cursor.moveToFirst();
+            retBundle = new Bundle();
+            retBundle.putInt("id", cursor.getInt(0));
+        }
+        return retBundle;
     }
 }
