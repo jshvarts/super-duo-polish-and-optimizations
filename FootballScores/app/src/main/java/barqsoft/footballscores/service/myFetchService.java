@@ -1,11 +1,15 @@
 package barqsoft.footballscores.service;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -25,6 +29,7 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 import barqsoft.footballscores.DatabaseContract;
+import barqsoft.footballscores.MainActivity;
 import barqsoft.footballscores.R;
 
 /**
@@ -279,6 +284,57 @@ public class myFetchService extends IntentService
         catch (JSONException e)
         {
             Log.e(LOG_TAG,e.getMessage());
+        }
+    }
+
+    public static class AlarmReceiver extends BroadcastReceiver {
+        public static final int NEW_SCORE_NOTIFICATION_ID = 3001;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundleBeforeRefresh = context.getContentResolver().call(DatabaseContract.BASE_CONTENT_URI,
+                    DatabaseContract.GET_LATEST_MATCH_ID_METHOD, null, null);
+
+            int latestMatchIdBeforeRefresh = bundleBeforeRefresh.getInt(DatabaseContract.scores_table.MATCH_ID);
+            if (latestMatchIdBeforeRefresh < 1) {
+                Log.e(LOG_TAG, "Unable to look up latestMatchIdBeforeRefresh");
+                return;
+            }
+            Log.d(LOG_TAG, "latest match id before refresh: " + latestMatchIdBeforeRefresh);
+
+            // re-query service data
+            Intent service_start = new Intent(context, myFetchService.class);
+            context.startService(service_start);
+
+            Bundle bundleAfterRefresh = context.getContentResolver().call(DatabaseContract.BASE_CONTENT_URI,
+                    DatabaseContract.GET_LATEST_MATCH_ID_METHOD, null, null);
+
+            int latestMatchIdAfterRefresh = bundleAfterRefresh.getInt(DatabaseContract.scores_table.MATCH_ID);
+            if (latestMatchIdAfterRefresh < 1) {
+                Log.e(LOG_TAG, "Unable to look up latestMatchIdAfterRefresh");
+                return;
+            }
+            Log.d(LOG_TAG, "latest match id after refresh: " + latestMatchIdAfterRefresh);
+
+            if (latestMatchIdAfterRefresh > latestMatchIdBeforeRefresh) {
+                NotificationManager notificationManager = (NotificationManager) context
+                        .getSystemService(Context.NOTIFICATION_SERVICE);
+
+                Intent notificationIntent = new Intent(context, MainActivity.class);
+                notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                PendingIntent pendingNotificationIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                NotificationCompat.Builder notificationBuilder =
+                        new NotificationCompat.Builder(context)
+                                .setSmallIcon(R.drawable.ic_launcher)
+                                .setContentTitle(context.getString(R.string.notification_title))
+                                .setContentText(context.getString(R.string.notification_content))
+                                .setContentIntent(pendingNotificationIntent)
+                                .setAutoCancel(true);
+
+                notificationManager.notify(NEW_SCORE_NOTIFICATION_ID, notificationBuilder.build());
+            }
         }
     }
 }

@@ -51,5 +51,5 @@ public class DatabaseContract
     public static Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
 
     // custom methods
-    public static String GET_LATEST_ID_METHOD = "getLatestId";
+    public static String GET_LATEST_MATCH_ID_METHOD = "getLatestMatchId";
 }
