@@ -31,11 +31,6 @@ public class FootballScoresApplication extends Application implements Applicatio
 
     @Override
     public void onActivityStarted(Activity activity) {
-        // do nothing
-    }
-
-    @Override
-    public void onActivityResumed(Activity activity) {
         // cancel alarm manager to avoid notifications while the app is in foreground
         AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
@@ -46,6 +41,11 @@ public class FootballScoresApplication extends Application implements Applicatio
         NotificationManager notificationManager = (NotificationManager) activity
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(AlarmReceiver.NEW_SCORE_NOTIFICATION_ID);
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+        // do nothing
     }
 
     @Override
