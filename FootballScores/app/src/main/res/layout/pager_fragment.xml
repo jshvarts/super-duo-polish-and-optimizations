@@ -18,6 +18,6 @@
             android:contentDescription="@string/pager_header_text"
             android:paddingLeft="10dp"
             android:paddingRight="10dp" />
-        ></android.support.v4.view.ViewPager>
+    </android.support.v4.view.ViewPager>
 
 </LinearLayout>
