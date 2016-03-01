@@ -5,8 +5,10 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,8 +40,11 @@ public class BookService extends IntentService {
 
     public static final String EAN = "it.jaschke.alexandria.services.extra.EAN";
 
+    private Handler mainThreadHandler = null;
+
     public BookService() {
         super("Alexandria");
+        mainThreadHandler = new Handler();
     }
 
     @Override
@@ -96,12 +101,12 @@ public class BookService extends IntentService {
         String bookJsonString = null;
 
         try {
-            final String FORECAST_BASE_URL = "https://www.googleapis.com/books/v1/volumes?";
+            final String BOOK_SEARCH_BASE_URL = "https://www.googleapis.com/books/v1/volumes?";
             final String QUERY_PARAM = "q";
 
             final String ISBN_PARAM = "isbn:" + ean;
 
-            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+            Uri builtUri = Uri.parse(BOOK_SEARCH_BASE_URL).buildUpon()
                     .appendQueryParameter(QUERY_PARAM, ISBN_PARAM)
                     .build();
 
@@ -141,7 +146,16 @@ public class BookService extends IntentService {
                     Log.e(LOG_TAG, "Error closing stream", e);
                 }
             }
+        }
 
+        if (bookJsonString == null) {
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "Check internet connection!", Toast.LENGTH_LONG).show();
+                }
+            });
+            return;
         }
 
         final String ITEMS = "items";
@@ -155,6 +169,7 @@ public class BookService extends IntentService {
         final String CATEGORIES = "categories";
         final String IMG_URL_PATH = "imageLinks";
         final String IMG_URL = "thumbnail";
+
 
         try {
             JSONObject bookJson = new JSONObject(bookJsonString);
