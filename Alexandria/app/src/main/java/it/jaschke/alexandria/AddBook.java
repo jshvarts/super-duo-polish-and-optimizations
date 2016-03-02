@@ -103,7 +103,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     startActivityForResult(scannerIntent, SCAN_EAN_REQUEST_CODE);
                 } catch (ActivityNotFoundException e) {
                     Log.e(LOG_TAG, "error scanning the barcode: " + e);
-                    Toast.makeText(getActivity(), "Error scanning the barcode!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), getString(R.string.barcode_scan_error), Toast.LENGTH_LONG).show();
                 }
             }
         });
