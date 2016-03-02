@@ -152,7 +152,8 @@ public class BookService extends IntentService {
             mainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(), "Check internet connection!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.connection_error),
+                            Toast.LENGTH_LONG).show();
                 }
             });
             return;

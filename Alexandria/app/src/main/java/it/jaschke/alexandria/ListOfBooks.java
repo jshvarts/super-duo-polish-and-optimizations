@@ -67,8 +67,11 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         );
 
         if (cursor.getCount() == 0) {
-            showNoBooksAvailableMessage();
-            return rootView;
+            View drawer = getActivity().findViewById(R.id.navigation_drawer);
+            if (drawer != null && drawer.getVisibility() != View.VISIBLE) {
+                showNoBooksAvailableMessage();
+                return rootView;
+            }
         }
 
         bookList = (ListView) rootView.findViewById(R.id.listOfBooks);
