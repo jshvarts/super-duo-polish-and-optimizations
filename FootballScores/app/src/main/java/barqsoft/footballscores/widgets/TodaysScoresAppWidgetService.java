@@ -85,20 +85,24 @@ public class TodaysScoresAppWidgetService extends RemoteViewsService {
             if (cursor.moveToPosition(position)) {
 
                 remoteViews.setTextViewText(R.id.home_name, cursor.getString(ScoresAdapter.COL_HOME));
+                remoteViews.setContentDescription(R.id.home_name, cursor.getString(ScoresAdapter.COL_HOME));
 
                 if (cursor.getString(ScoresAdapter.COL_HOME_GOALS).equals("-1")) {
-                    remoteViews.setTextViewText(R.id.home_score_textview, "N/A");
+                    remoteViews.setTextViewText(R.id.home_score_textview, "");
+                    remoteViews.setContentDescription(R.id.home_score_textview, serviceContext.getString(R.string.score_not_available));
                 } else {
                     remoteViews.setTextViewText(R.id.home_score_textview, cursor.getString(ScoresAdapter.COL_HOME_GOALS));
                 }
 
                 if (cursor.getString(ScoresAdapter.COL_AWAY_GOALS).equals("-1")) {
                     remoteViews.setTextViewText(R.id.away_score_textview, "");
+                    remoteViews.setContentDescription(R.id.away_score_textview, serviceContext.getString(R.string.score_not_available));
                 } else {
                     remoteViews.setTextViewText(R.id.away_score_textview, cursor.getString(ScoresAdapter.COL_AWAY_GOALS));
                 }
 
                 remoteViews.setTextViewText(R.id.away_name, cursor.getString(ScoresAdapter.COL_AWAY));
+                remoteViews.setContentDescription(R.id.away_name, cursor.getString(ScoresAdapter.COL_AWAY));
             }
             return remoteViews;
         }
