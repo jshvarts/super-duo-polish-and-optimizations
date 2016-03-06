@@ -38,6 +38,7 @@
     <string name="home_crest_text">Home Crest</string>
     <string name="home_name_text">Home Name</string>
     <string name="score_text">Score</string>
+    <string name="score_not_available">Score not available</string>
     <string name="data_text">Data</string>
     <string name="away_crest_text">Away Crest</string>
     <string name="away_name_text">Away Name</string>
