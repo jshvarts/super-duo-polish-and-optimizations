@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
@@ -8,4 +9,7 @@
     <dimen name="Score">30sp</dimen>
     <dimen name="League">15sp</dimen>
     <dimen name="pager_tab_textsize">16sp</dimen>
+    <dimen name="widget_min_width">100dp</dimen>
+    <dimen name="widget_min_height">150dp</dimen>
+    <dimen name="widget_textsize">14sp</dimen>
 </resources>

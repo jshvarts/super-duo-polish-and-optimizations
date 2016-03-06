@@ -44,4 +44,5 @@
     <string name="pager_header_text">Header</string>
     <string name="notification_title">Football Scores</string>
     <string name="notification_content">New football scores available!</string>
+    <string name="todays_scores_appwidget_no_results">Football Scores widget returned no results</string>
 </resources>
