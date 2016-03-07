@@ -29,17 +29,11 @@ public class TodaysScoresAppWidgetProvider extends AppWidgetProvider {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
 
-            // Set up the RemoteViews object to use a RemoteViews adapter.
-            // This adapter connects
-            // to a RemoteViewsService  through the specified intent.
-            // This is how you populate the data.
             views.setRemoteAdapter(appWidgetId, R.id.todays_scores_list, intent);
-            // The empty view is displayed when the collection has no items.
-            // It should be in the same layout used to instantiate the RemoteViews
-            // object above.
+
             views.setEmptyView(R.id.todays_scores_list, R.id.todays_scores_empty_view);
+
             appWidgetManager.updateAppWidget(appWidgetId, views);
-            //starts service to do the heavy lifting
         }
     }
 }
