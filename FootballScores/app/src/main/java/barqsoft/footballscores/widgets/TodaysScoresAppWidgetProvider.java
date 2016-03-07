@@ -19,7 +19,7 @@ public class TodaysScoresAppWidgetProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
-        Log.d(LOG_TAG, "entered onUpdate");
+        Log.d(LOG_TAG, "performing Todays Scores Widget onUpdate()");
 
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(),
